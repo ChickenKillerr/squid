@@ -1,7 +1,7 @@
 # Proxy Squid
 
 
-"""bash
+```bash
 icap_enable on
 icap_service service_req reqmod_precache bypass=1 icap://192.168.183.14:1344/request
 adaptation_access service_req allow all
@@ -51,4 +51,4 @@ refresh_pattern ^gopher:        1440    0%      1440
 refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
 refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
 refresh_pattern .               0       20%     4320
-"""
+```
