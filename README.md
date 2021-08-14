@@ -52,3 +52,42 @@ refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
 refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
 refresh_pattern .               0       20%     4320
 ```
+    
+For Work Network, you need open ports in firewall    
+    
+```bash
+iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+
+iptables -P INPUT DROP
+
+iptables -P FORWARD DROP
+
+iptables -A INPUT -p icmp -j ACCEPT
+
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+
+iptables -A INPUT -i lo -j ACCEPT
+
+iptables -A INPUT -p tcp -m multiport --ports 53 -s 192.168.183.0/24 -j ACCEPT
+
+iptables -A INPUT -p udp -m multiport --ports 53 -s 192.168.183.0/24 -j ACCEPT
+
+iptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+iptables -A FORWARD -p icmp -j ACCEPT
+
+iptables -A FORWARD -p tcp -m multiport --ports 80,8080,110,5190,25,21,443 -s 192.168.183.0/24 -j ACCEPT
+
+iptables -A INPUT -s 192.168.183.0/24 -p tcp -m multiport --ports 3128 -j ACCEPT
+
+iptables -t nat -A PREROUTING -s 192.168.183.0/24 -p tcp -m multiport --dports 80,8080 -j REDIRECT --to-ports 3128
+
+iptables -A INPUT -s 192.168.183.0/24 -p tcp -m multiport --ports 3129 -j ACCEPT
+
+iptables -t nat -A PREROUTING -s 192.168.183.0/24 -p tcp -m multiport --dports 443 -j REDIRECT --to-ports 3129
+
+netfilter-persistent save
+
+iptables-save
+```
